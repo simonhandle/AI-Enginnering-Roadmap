@@ -1,3 +1,5 @@
 test.ipynb
 roadmap.md
 .DS_Store
+.api_keys.env
+.venv/

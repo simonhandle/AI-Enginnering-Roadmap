@@ -1,0 +1,4 @@
+requests
+mcp[cli]
+sentence-transformers
+numpy
