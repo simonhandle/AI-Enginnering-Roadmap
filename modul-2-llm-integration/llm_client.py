@@ -35,7 +35,6 @@ PROVIDERS = {
 }
 print(repr(PROVIDERS["groq"]["api_key"])[:15])
 
-
 class RetryableError(Exception):
     pass
 

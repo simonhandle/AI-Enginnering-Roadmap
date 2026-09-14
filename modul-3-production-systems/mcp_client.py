@@ -34,6 +34,7 @@ Bearbeite die TODOs der Reihe nach.
 import asyncio
 import json
 import os
+import sys
 from pathlib import Path
 
 import requests
@@ -41,10 +42,10 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_MODEL = "openai/gpt-oss-120b"
 
 SERVER_PARAMS = StdioServerParameters(
-    command="/Users/simon/Developer/Claude/AI Engineering/.venv/bin/python",
+    command=sys.executable,  # dasselbe Python (venv), mit dem der Client läuft
     args=["mcp_server.py"],
     cwd=str(Path(__file__).parent),
 )

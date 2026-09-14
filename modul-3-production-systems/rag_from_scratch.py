@@ -36,7 +36,7 @@ NOTES_DIR = Path(__file__).parent / "sample_notes"
 MODEL_NAME = "paraphrase-multilingual-MiniLM-L12-v2"  # mehrsprachig, klein, läuft lokal
 
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_MODEL = "openai/gpt-oss-120b"
 
 
 def load_chunks() -> list[dict]:
@@ -74,14 +74,16 @@ def top_k_chunks(
     ist (absteigend sortiert). Tipp: np.argsort gibt aufsteigend sortierte
     Indizes zurück."""
 
-    dot_products = query_embedding * chunk_embeddings
+    dot_products = chunk_embeddings @ query_embedding
     norm_query = np.linalg.norm(query_embedding)
-    norm_chunks = np.linalg.norm(chunk_embeddings)
-
-    #print()
-
+    norm_chunks = np.linalg.norm(chunk_embeddings,axis=1)
+    similarities = np.argsort(dot_products / (norm_chunks * norm_query),descending=True)
+    top_k = similarities[:k]
+    result = []
+    for index in top_k:
+        result.append(chunks[index])
+    return result
     
-
 
 def call_groq(prompt: str) -> str:
     """Schickt einen einzelnen User-Prompt an Groq, gibt den Antworttext
@@ -114,14 +116,17 @@ def answer_question(question: str, k: int = 3):
         print(f"[{c['source']}] {c['text'][:80]}...")
     print("------------------------")
 
-    # TODO 3: Baue aus `top_chunks` und `question` einen Prompt für Groq und
-    # gib die Antwort aus. Wichtig für "echtes RAG" statt Halluzination:
-    # der Prompt sollte das Modell anweisen, NUR den gegebenen Kontext zu
-    # nutzen (und zu sagen, wenn die Antwort dort nicht drin steht).
-    raise NotImplementedError
+    """Baue aus `top_chunks` und `question` einen Prompt für Groq und
+    gib die Antwort aus. Wichtig für "echtes RAG" statt Halluzination:
+    der Prompt sollte das Modell anweisen, NUR den gegebenen Kontext zu
+    nutzen (und zu sagen, wenn die Antwort dort nicht drin steht)."""
+
+    prompt = f"Beantworte folgende Frage: {question}\n Nutze dafür NUR folgenden Kontext: {top_chunks}"
+    answer = call_groq(prompt)
+    print(answer)
 
 
 if __name__ == "__main__":
     # Bewusst OHNE die Wörter "Auslastung"/"Occupancy" formuliert, um zu
     # testen, ob die Embedding-Suche findet, was Keyword-Suche nicht könnte.
-    #answer_question("Wie misst man, wie voll ein Hotel ist?")
+    answer_question("Wie misst man, wie voll ein Hotel ist?")
