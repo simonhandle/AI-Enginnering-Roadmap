@@ -26,9 +26,6 @@ PROVIDERS = {
     },
     "huggingface": {
         "url": "https://router.huggingface.co/v1/chat/completions",
-        # Meta-Modelle sind auf HF oft "gated" (Lizenz muss erst akzeptiert
-        # werden). Falls dieses Modell einen 403 wirft: auf huggingface.co
-        # nach einem ungated Modell suchen, z.B. Qwen/Qwen2.5-7B-Instruct.
         "model": "meta-llama/Llama-3.1-8B-Instruct",
         "api_key": os.environ.get("HF_TOKEN"),
     },

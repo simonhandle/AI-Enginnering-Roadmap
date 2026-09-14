@@ -10,8 +10,6 @@ Testbar gegen httpbin.org (kein API-Key nötig):
 - https://httpbin.org/status/404    -> Client-Fehler, sollte NICHT retried werden
 - https://httpbin.org/delay/5       -> zum Testen von Timeout-Handling
 - https://httpbin.org/status/429    -> Rate-Limit-Fall
-
-Bearbeite die TODOs der Reihe nach. Jeder Block testet ein anderes Konzept.
 """
 
 import time
@@ -59,44 +57,6 @@ def fetch_json(url: str, max_retries: int = 3, timeout: float = 3.0) -> dict:
             time.sleep(backoff)
             continue
     raise RetryableError(f"Failed after {max_retries} attempts.")
-        
-
-
-    
-    """
-    Holt JSON von `url` mit Retry-Logik.
-
-    TODO 1 — Timeout:
-        Setze bei jedem requests.get() ein explizites timeout=timeout.
-        Ohne Timeout kann ein Request theoretisch ewig hängen.
-
-    TODO 2 — Transiente Fehler erkennen und retryen:
-        - Antwort mit Status >= 500  -> RetryableError
-        - requests.exceptions.Timeout / ConnectionError -> RetryableError
-        Bei RetryableError: erneut versuchen, bis max_retries erreicht ist.
-        Nutze Exponential Backoff mit Jitter zwischen den Versuchen
-        (z.B. wait = base_delay * (2 ** attempt) + random jitter).
-
-    TODO 3 — Client-Fehler NICHT retryen:
-        Status 400-499 (außer 429) -> sofort ClientError werfen, kein Retry.
-        Ein 404 wird durch Warten nicht plötzlich zu einem 200.
-
-    TODO 4 — Rate Limiting (429) korrekt behandeln:
-        Bei Status 429: prüfe den 'Retry-After' Header (Sekunden).
-        Falls vorhanden, warte genau so lange statt mit Backoff zu raten.
-        Falls nicht vorhanden, fallback auf normalen Backoff.
-
-    TODO 5 — Malformed JSON:
-        response.json() kann eine JSONDecodeError werfen, wenn der Body
-        kein valides JSON ist (z.B. HTML-Fehlerseite). Fange das ab und
-        wirf eine aussagekräftige eigene Exception statt den rohen Fehler
-        durchzureichen.
-
-    Am Ende: wenn alle Retries aufgebraucht sind, wirf die letzte
-    RetryableError statt still zu scheitern.
-    """
-    # raise NotImplementedError("TODO: implementieren")
-
 
 
 if __name__ == "__main__":
